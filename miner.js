@@ -86,17 +86,12 @@ module.exports = class Miner extends Client {
   findProof(oneAndDone=false) {
     let pausePoint = this.currentBlock.proof + NUM_ROUNDS_MINING;
     while (this.currentBlock.proof < pausePoint) {
-
-      //
-      // **YOUR CODE HERE**
-      //
-      // Search for a proof.  If one is found, the miner should add the coinbase
-      // rewards (including the transaction fees) to its wallet.
-      //
-      // Next, announce the proof to all other miners.
-      //
-      // After that, create a new block and start searching for a proof.
-      // The 'startNewSearch' method might be useful for this last step.
+      if(this.currentBlock.verifyProof() && this.isValidBlock(this.currentBlock)){
+        this.wallet.addUTXO(this.currentBlock.coinbaseTX.outputs[0], this.currentBlock.coinbaseTX.id, 0); //adding the coinbase rewards.
+        this.announceProof();
+        this.startNewSearch();
+        this.log("Found a proof...");
+      }
 
       this.currentBlock.proof++;
     }

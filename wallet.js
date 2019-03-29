@@ -88,25 +88,26 @@ module.exports = class Wallet {
     if (amount > this.balance) {
       throw new Error(`Insufficient funds.  Requested ${amount}, but only ${this.balance} is available.`);
     }
+    
+    let arr = [];
+    let sum = 0;
+    while(sum < amount){
+      let coin = this.coins.pop();
+      let adr = this.addresses[coin.output.address];
+      arr.push({
+        txID: coin.txID, 
+        outputIndex: coin.outputIndex, 
+        pubKey: adr.public,
+        sig: utils.sign(adr.private, JSON.stringify(coin.output)),
+      });
+      sum += coin.output.amount;
+    }
 
-    //
-    // **YOUR CODE HERE**
-    //
-    // Gather enough "coins" from the wallet to meet or exceed
-    // the specified amount.  Create an array of inputs that
-    // can unlock the UTXOs.
-    //
-    // Return an object containing the array of inputs and the
-    // amount of change needed.
-
-
-    // Currently returning default values.
-    return {
-      inputs: [],
-      changeAmt: 0,
+    return{
+      inputs: arr,
+      changeAmt: sum - amount,
     };
-
-  }
+}
 
   /**
    * Makes a new keypair and calculates its address from that.

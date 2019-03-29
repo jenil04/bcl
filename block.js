@@ -185,19 +185,21 @@ module.exports = class Block {
       throw new Error(`Transaction ${tx.id} is invalid.`);
     }
 
-    //
-    // **YOUR CODE HERE**
-    //
-    // First, store the transaction.
-    //
-    // Next, you will need to update the UTXOs to account for changes made by the transaction.
-    // That means you will need to:
-    // 1) Delete the spent UTXOs from the UTXO set.
-    // 2) Add newly created UTXOs to the UTXO set.
-    // 3) Calculate the miner's transaction fee, determined by the difference between the inputs and the outputs.
-    //    The addTransactionFee method might help you with this part.
+    let input = 0;
+    this.transactions.set(tx.id, tx);
 
-  }
+    tx.inputs.forEach(({txID, outputIndex}) => {
+      input += this.utxos[txID][outputIndex].amount;
+      delete this.utxos[txID][outputIndex]; //Deleting the spent UTXOs from the UTXO set.
+    });
+
+    this.utxos[tx.id] = tx.outputs; //Adding newly created UTXOs to the UTXO set.
+    if(forceAccept){
+      return; //checking for a coinbase tx.
+    } 
+
+    this.addTransactionFee(input - tx.totalOutput()); //Calculating the transaction fee.
+}
 
   /**
    * Adds the transaction fee to the miner's coinbase transaction.
