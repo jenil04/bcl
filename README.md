@@ -1,2 +1,2 @@
 # bcl
-Starter code for "Bitcoin Lite".
+Bitcoin Lite -- Starter code courtesy, Dr. Thomas Austin.
